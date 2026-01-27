@@ -1,10 +1,14 @@
-import { LoginForm } from "@/features/auth/components/login-form";
-const Page = () => {
+"use client";
+
+import { requireAuth } from "@/lib/auth-utils";
+
+const Page = async () => {
+  await requireAuth();
   return (
-    <>
-    <LoginForm />
-    </>
+    <div className="min-h-screen min-w-screen flex items-center justify-center">
+      Protected server-side page
+    </div>
   );
-};
+}
 
 export default Page;
