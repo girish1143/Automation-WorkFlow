@@ -1,14 +1,17 @@
-"use client";
+"use server";
 
 import { requireAuth } from "@/lib/auth-utils";
+import { caller } from "@/trpc/server";
 
-const Page = async () => {
+export default async function Page() {
   await requireAuth();
+  
+  const data = await caller.getUsers();
+
   return (
     <div className="min-h-screen min-w-screen flex items-center justify-center">
       Protected server-side page
+      <div>{JSON.stringify(data)}</div>
     </div>
   );
 }
-
-export default Page;
