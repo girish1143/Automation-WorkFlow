@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { email, z } from "zod";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Image from "next/image";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -27,12 +26,7 @@ import {
 } from "@/components/ui/form";
 
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import path from "path";
-import { auth } from "@/lib/Auth";
-import { authClient } from "@/lib/auth-client";
-import { callbackify } from "util";
-import { on } from "events";
+
 
 const registerSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -60,21 +54,21 @@ export function RegisterForm() {
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
-    await authClient.signUp.email(
-      {
-      name: values.email,
-      email: values.email,
-      password: values.password,
-      callbackURL: "/",
-      },
-      {
-      onSuccess: () => {
-        router.push("/");
-      },
-      onError: (ctx) => {
-        toast.error(ctx.error.message);
-      },
-    });
+    console.log("submitting details");
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+      });
+    } catch (error) {
+      toast.error("Failed to create an account");
+    }
   };
 
   const isPending = form.formState.isSubmitting;
@@ -155,7 +149,7 @@ export function RegisterForm() {
 
                   <FormField
                     control={form.control}
-                    name="password"
+                    name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Confirmed Password</FormLabel>
@@ -170,7 +164,6 @@ export function RegisterForm() {
                       </FormItem>
                     )}
                   />
-
                   <Button
                     type="submit"
                     className="w-full"
